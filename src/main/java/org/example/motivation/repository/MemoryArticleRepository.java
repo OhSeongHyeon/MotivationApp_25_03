@@ -1,6 +1,6 @@
-package org.example.repository;
+package org.example.motivation.repository;
 
-import org.example.model.Motivation;
+import org.example.motivation.entity.Motivation;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -27,11 +27,12 @@ public class MemoryArticleRepository implements IArticleRepository {
         return null;
     }
 
-    public boolean deleteMotivation(Motivation motivation) {
-        if (motivation.isExposure()) {
-            motivation.setExposure(false);
-            return true;
-        }
-        return false;
+    public void deleteMotivation(Motivation motivation) {
+        motivation.setExposure(false);
+    }
+
+    public void modifyMotivation(Motivation motivation, String inputSource, String inputMotivation) {
+        motivation.setSource(inputSource);
+        motivation.setMotivation(inputMotivation);
     }
 }

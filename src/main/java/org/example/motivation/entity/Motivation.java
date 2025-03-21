@@ -1,4 +1,4 @@
-package org.example.model;
+package org.example.motivation.entity;
 
 public class Motivation implements Comparable<Motivation> {
     private int seq; //해당글의 게시된 글번호 (리스트 추가 삭제하더라도 이건 안바꿈)
@@ -13,6 +13,7 @@ public class Motivation implements Comparable<Motivation> {
         this.seq = seq;
         this.source = source;
         this.motivation = motivation;
+        this.isExposure = true;
     }
 
     public int getSeq() {
@@ -43,8 +44,8 @@ public class Motivation implements Comparable<Motivation> {
         return isExposure;
     }
 
-    public void setExposure(boolean exposure) {
-        isExposure = exposure;
+    public void setExposure(boolean isExposure) {
+        this.isExposure = isExposure;
     }
 
     @Override
@@ -55,5 +56,15 @@ public class Motivation implements Comparable<Motivation> {
             return 0;
         }
         return -1;
+    }
+
+    @Override
+    public String toString() {
+        return "Motivation{" +
+                "seq=" + seq +
+                ", source='" + source + '\'' +
+                ", motivation='" + motivation + '\'' +
+                ", isExposure=" + isExposure +
+                '}';
     }
 }

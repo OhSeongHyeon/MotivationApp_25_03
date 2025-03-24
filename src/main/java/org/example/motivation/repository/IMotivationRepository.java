@@ -3,14 +3,15 @@ package org.example.motivation.repository;
 import org.example.motivation.entity.Motivation;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface IArticleRepository {
+public interface IMotivationRepository {
 
     int save(Motivation motivation);
 
     List<Motivation> getMotivations();
 
-    Motivation getMotivation(int seq);
+    Optional<Motivation> getMotivation(int seq);
 
     void deleteMotivation(Motivation motivation);
 

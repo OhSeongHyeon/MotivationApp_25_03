@@ -9,11 +9,11 @@ public class Motivation implements Comparable<Motivation> {
     public Motivation() {
     }
 
-    public Motivation(int seq, String source, String motivation) {
+    public Motivation(int seq, String source, String motivation, boolean isExposure) {
         this.seq = seq;
         this.source = source;
         this.motivation = motivation;
-        this.isExposure = true;
+        this.isExposure = isExposure;
     }
 
     public int getSeq() {

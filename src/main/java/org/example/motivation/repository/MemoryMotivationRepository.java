@@ -4,12 +4,17 @@ import org.example.motivation.entity.Motivation;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class MemoryArticleRepository implements IArticleRepository {
+public class MemoryMotivationRepository implements IMotivationRepository {
 
-    List<Motivation> motivations = new LinkedList<>();
+    private final AtomicInteger seq = new AtomicInteger(0);
+    private final List<Motivation> motivations = new LinkedList<>();
 
     public int save(Motivation motivation) {
+        motivation.setSeq(seq.getAndIncrement());
+        motivation.setExposure(true);
         motivations.add(motivation);
         return motivations.get(motivations.size() - 1).getSeq();
     }
@@ -18,13 +23,13 @@ public class MemoryArticleRepository implements IArticleRepository {
         return motivations;
     }
 
-    public Motivation getMotivation(int seq) {
+    public Optional<Motivation> getMotivation(int seq) {
         for (Motivation motivation : motivations) {
             if (motivation.getSeq() == seq) {
-                return motivation;
+                return Optional.of(motivation);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     public void deleteMotivation(Motivation motivation) {

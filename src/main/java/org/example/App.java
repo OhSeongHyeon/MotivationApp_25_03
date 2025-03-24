@@ -1,14 +1,10 @@
 package org.example;
 
 import org.example.motivation.controller.MotivationController;
-import org.example.motivation.entity.Motivation;
-import org.example.motivation.service.ArticleService;
-import org.example.system.MyUtils;
 import org.example.system.controller.SystemController;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Collections;
 
 public class App {
 
@@ -17,10 +13,10 @@ public class App {
     private final SystemController systemController;
     private final MotivationController motivationController;
 
-    public App(BufferedReader br) {
-        this.br = br;
-        systemController = new SystemController();
-        motivationController = new MotivationController(br);
+    public App() {
+        this.br = Container.getBufferedReader();
+        this.systemController = new SystemController();
+        this.motivationController = new MotivationController();
     }
 
     public void run() throws IOException {

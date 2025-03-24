@@ -1,23 +1,24 @@
 package org.example.motivation.controller;
 
+import org.example.Container;
 import org.example.motivation.entity.Motivation;
-import org.example.motivation.service.ArticleService;
+import org.example.motivation.service.MotivationService;
 import org.example.system.MyUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Optional;
 
 public class MotivationController {
 
     private final BufferedReader br;
-    private int seq = 0;
 
-    private final ArticleService articleService;
+    private final MotivationService motivationService;
 
-    public MotivationController(BufferedReader br) {
-        this.br = br;
-        articleService = new ArticleService();
+    public MotivationController() {
+        this.br = Container.getBufferedReader();
+        motivationService = new MotivationService();
         insertDummy(10);
     }
 
@@ -33,12 +34,9 @@ public class MotivationController {
 
         for (int i = 0; i < n; i++) {
             Motivation param = new Motivation();
-            param.setSeq(seq);
             param.setSource(sStr[i % sStr.length]);
             param.setMotivation(mStr[i % mStr.length]);
-            param.setExposure(true);
-            seq += 1;
-            articleService.save(param);
+            motivationService.save(param);
         }
     }
 
@@ -50,14 +48,10 @@ public class MotivationController {
         String inputSource = br.readLine();
 
         Motivation param = new Motivation();
-        param.setSeq(seq);
         param.setSource(inputSource);
         param.setMotivation(inputMotivation);
-        param.setExposure(true);
 
-        seq += 1;
-
-        int resSeq = articleService.save(param);
+        int resSeq = motivationService.save(param);
         System.out.printf("%d번 motivation이 등록됨\n", resSeq + 1);
     }
 
@@ -67,7 +61,7 @@ public class MotivationController {
         System.out.println("번호 / source / motivation");
         StringBuilder sb = new StringBuilder();
 
-        articleService.getAllMotivations()
+        motivationService.getAllMotivations()
                 .stream()
                 .filter(Motivation::isExposure)
                 .sorted(Collections.reverseOrder())
@@ -87,56 +81,24 @@ public class MotivationController {
     }
 
     public void delete(String cmd) throws IOException {
-        String[] cmdArgs = cmd.split("\\s");
-        int cmdArg1 = -1; // 명령어 파라미터, 두번째 파라미터 입력 안한 경우 -1
-
-        if (cmdArgs.length > 1) {
-            if (MyUtils.isNumber(cmdArgs[1])) {
-                cmdArg1 = Integer.parseInt(cmdArgs[1]);
-                if (cmdArg1 < 0) {
-                    System.out.println("두번째 파라미터에 양수값을 입력 해주세요.");
-                    return;
-                }
-            } else {
-                System.out.println("두번째 파라미터에 숫자를 입력 해주세요.");
-                return;
-            }
-        }
-
-        int targetSeq = cmdArg1;
+        int targetSeq = getTargetSeq(cmd);
         if (targetSeq == -1) {
             System.out.print("삭제할 대상의 번호: ");
             targetSeq = Integer.parseInt(br.readLine());
         }
-        boolean isDeleted = articleService.deleteMotivation(targetSeq);
+        boolean isDeleted = motivationService.deleteMotivation(targetSeq);
         System.out.printf(isDeleted ? "%d번 삭제 성공\n" : "%d번은 존재하지 않음\n", targetSeq);
     }
 
     public void modify(String cmd) throws IOException {
-        String[] cmdArgs = cmd.split("\\s");
-        int cmdArg1 = -1; // 명령어 파라미터, 두번째 파라미터 입력 안한 경우 -1
-
-        if (cmdArgs.length > 1) {
-            if (MyUtils.isNumber(cmdArgs[1])) {
-                cmdArg1 = Integer.parseInt(cmdArgs[1]);
-                if (cmdArg1 < 0) {
-                    System.out.println("두번째 파라미터에 양수값을 입력 해주세요.");
-                    return;
-                }
-            } else {
-                System.out.println("두번째 파라미터에 숫자를 입력 해주세요.");
-                return;
-            }
-        }
-
-        int targetSeq = cmdArg1;
+        int targetSeq = getTargetSeq(cmd);
         if (targetSeq == -1) {
             System.out.print("수정할 대상의 번호: ");
             targetSeq = Integer.parseInt(br.readLine());
         }
 
-        Motivation motivation = articleService.getMotivation(targetSeq);
-        if (motivation == null || !motivation.isExposure()) {
+        Optional<Motivation> motivation = motivationService.getMotivation(targetSeq);
+        if (motivation.isEmpty() || !motivation.get().isExposure()) {
             System.out.printf("%d번은 존재하지 않음\n", targetSeq);
             return;
         }
@@ -147,7 +109,23 @@ public class MotivationController {
         System.out.print("motivation: ");
         String inputMotivation = br.readLine();
 
-        boolean isModified = articleService.modifyMotivation(targetSeq, inputSource, inputMotivation);
+        boolean isModified = motivationService.modifyMotivation(targetSeq, inputSource, inputMotivation);
         System.out.printf(isModified ? "%d번 수정 성공\n" : "%d번 수정 실패\n", targetSeq);
+    }
+
+    public int getTargetSeq(String cmd) {
+        String[] cmdArgs = cmd.split("\\s|\\?");
+        int cmdArg1 = -1; // 명령어 파라미터, 두번째 파라미터 입력 안한 경우 -1
+
+        if (cmdArgs.length > 1) {
+            if (MyUtils.isNumber(cmdArgs[1])) {
+                cmdArg1 = Integer.parseInt(cmdArgs[1]);
+            } else { // id=1, id=2 이런식
+                String[] cmdArg1Sp = cmdArgs[1].split("=");
+                cmdArg1 = Integer.parseInt(cmdArg1Sp[1]);
+            }
+        }
+
+        return cmdArg1;
     }
 }
